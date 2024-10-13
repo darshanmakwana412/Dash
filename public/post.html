@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Post | Darshan Makwana</title>
+    <link rel="stylesheet" href="css/style.css"/>
+    <link rel="stylesheet" href="css/fonts.css"/>
+</head>
+<body>
+    <nav style="display: flex; justify-content: space-between;">
+        <h1>Darshan Makwana</h1>
+        <ul class="menu">
+<li><a href="index.html">Home</a></li><li><a href="about.html">About</a></li><li><a href="post.html">Post</a></li>
+        </ul>
+    </nav>
+    <hr/>
+    <main>
+        <h1 id="an-analysis-of-the-stable-matching-problem">An analysis of the Stable Matching Problem</h1>
+<p><em>Posted on October 13, 2024</em></p>
+<p>The Stable Matching Problem seeks to find a <strong>stable</strong> way to pair elements from two equally sized sets based on their preferences. Imagine matching <strong>n</strong> men and <strong>n</strong> women such that no pair of individuals would prefer each other over their current matches. If such a scenario exists where no two individuals would rather be with each other than their assigned partners, the matching is deemed stable.</p>
+<p>More formally a <strong>Matching</strong> is a bijection between two sets (e.g., men and women), where each element from one set is paired with exactly one element from the other set and a matching is <strong>Stable</strong> if there are no two elements, one from each set, who would both prefer each other over their current matches. Such a pair is called a <strong>blocking pair</strong>, and their existence would render the matching unstable.</p>
+<h3 id="real-world-applications">Real-World Applications</h3>
+<p>The implications of stable matching extend far beyond hypothetical scenarios:</p>
+<ul>
+<li><strong>National Resident Matching Program (NRMP)</strong>: Each year, thousands of new doctors are assigned to hospitals across the United States through the NRMP, ensuring a stable and fair distribution based on preferences.</li>
+<li><strong>College Admissions</strong>: Universities use stable matching algorithms to assign students to programs, optimizing for both institutional preferences and student choices.</li>
+<li><strong>Distributed Internet Services</strong>: Assigning users to servers in large-scale networks to ensure efficiency and user satisfaction.</li>
+</ul>
+<p>Understanding the stable matching problem not only offers insights into these systems but also highlights the elegance of algorithmic solutions in addressing real-world challenges.</p>
+<h2 id="gale-shapley-algorithm">Gale-Shapley Algorithm</h2>
+<p>The gale-shapley algorithm guarantees the existence of a stable matching for any set of preferences, it operates in iterative rounds, where one group (traditionally men) proposes to their most preferred choice, and the other group (women) tentatively accepts the best offer they receive while rejecting the rest. This process continues until all participants are matched</p>
+<ol type="1">
+<li><strong>Initialization</strong>: All men and women are initially free.</li>
+<li><strong>Proposal Phase</strong>:
+<ul>
+<li>Each free man proposes to the highest-ranked woman on his preference list who hasn’t rejected him yet.</li>
+<li>Each woman considers all proposals received in the current round.</li>
+</ul></li>
+<li><strong>Acceptance Phase</strong>:
+<ul>
+<li>Each woman tentatively accepts the proposal from the man she prefers most among those who proposed and rejects the others.</li>
+<li>Rejected men become free again and will propose to their next preferred woman in subsequent rounds.</li>
+</ul></li>
+<li><strong>Termination</strong>: The algorithm concludes when there are no free men left, resulting in a stable matching.</li>
+</ol>
+<div class="sourceCode" id="cb1"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a><span class="kw">def</span> gale_shapley(men_prefs: List[List[<span class="bu">int</span>]], women_prefs: List[List[<span class="bu">int</span>]]) <span class="op">-&gt;</span> List[<span class="bu">int</span>]:</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true"></a>    n <span class="op">=</span> <span class="bu">len</span>(men_prefs)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true"></a>    free_men <span class="op">=</span> <span class="bu">list</span>(<span class="bu">range</span>(n))</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true"></a>    men_next_proposal <span class="op">=</span> [<span class="dv">0</span>] <span class="op">*</span> n</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true"></a>    women_engaged_to <span class="op">=</span> [<span class="op">-</span><span class="dv">1</span>] <span class="op">*</span> n</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true"></a></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true"></a>    <span class="co"># Precompute women&#39;s preference rankings for quick comparison</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true"></a>    women_rankings <span class="op">=</span> []</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true"></a>    <span class="cf">for</span> prefs <span class="kw">in</span> women_prefs:</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true"></a>        ranking <span class="op">=</span> {man: rank <span class="cf">for</span> rank, man <span class="kw">in</span> <span class="bu">enumerate</span>(prefs)}</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true"></a>        women_rankings.append(ranking)</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true"></a></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true"></a>    <span class="cf">while</span> free_men:</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true"></a>        man <span class="op">=</span> free_men.pop(<span class="dv">0</span>)</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true"></a>        woman <span class="op">=</span> men_prefs[man][men_next_proposal[man]]</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true"></a>        men_next_proposal[man] <span class="op">+=</span> <span class="dv">1</span></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true"></a></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true"></a>        <span class="cf">if</span> women_engaged_to[woman] <span class="op">==</span> <span class="op">-</span><span class="dv">1</span>:</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true"></a>            <span class="co"># Woman is free</span></span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true"></a>            women_engaged_to[woman] <span class="op">=</span> man</span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true"></a>        <span class="cf">else</span>:</span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true"></a>            current_man <span class="op">=</span> women_engaged_to[woman]</span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true"></a>            <span class="co"># Check if the new man is preferred over the current engagement</span></span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true"></a>            <span class="cf">if</span> women_rankings[woman][man] <span class="op">&lt;</span> women_rankings[woman][current_man]:</span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true"></a>                women_engaged_to[woman] <span class="op">=</span> man</span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true"></a>                free_men.append(current_man)</span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true"></a>            <span class="cf">else</span>:</span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true"></a>                free_men.append(man)</span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true"></a></span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true"></a>    <span class="co"># Prepare the result: man -&gt; woman</span></span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true"></a>    man_to_woman <span class="op">=</span> [<span class="op">-</span><span class="dv">1</span>] <span class="op">*</span> n</span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true"></a>    <span class="cf">for</span> woman, man <span class="kw">in</span> <span class="bu">enumerate</span>(women_engaged_to):</span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true"></a>        man_to_woman[man] <span class="op">=</span> woman</span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true"></a></span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true"></a>    <span class="cf">return</span> man_to_woman</span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true"></a></span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true"></a>men_preferences <span class="op">=</span> [</span>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true"></a>    [<span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">2</span>],</span>
+<span id="cb1-39"><a href="#cb1-39" aria-hidden="true"></a>    [<span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">2</span>],</span>
+<span id="cb1-40"><a href="#cb1-40" aria-hidden="true"></a>    [<span class="dv">2</span>, <span class="dv">0</span>, <span class="dv">1</span>]</span>
+<span id="cb1-41"><a href="#cb1-41" aria-hidden="true"></a>]</span>
+<span id="cb1-42"><a href="#cb1-42" aria-hidden="true"></a></span>
+<span id="cb1-43"><a href="#cb1-43" aria-hidden="true"></a>women_preferences <span class="op">=</span> [</span>
+<span id="cb1-44"><a href="#cb1-44" aria-hidden="true"></a>    [<span class="dv">2</span>, <span class="dv">0</span>, <span class="dv">1</span>],</span>
+<span id="cb1-45"><a href="#cb1-45" aria-hidden="true"></a>    [<span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">2</span>],</span>
+<span id="cb1-46"><a href="#cb1-46" aria-hidden="true"></a>    [<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">0</span>]</span>
+<span id="cb1-47"><a href="#cb1-47" aria-hidden="true"></a>]</span>
+<span id="cb1-48"><a href="#cb1-48" aria-hidden="true"></a></span>
+<span id="cb1-49"><a href="#cb1-49" aria-hidden="true"></a>result <span class="op">=</span> gale_shapley(men_preferences, women_preferences)</span>
+<span id="cb1-50"><a href="#cb1-50" aria-hidden="true"></a><span class="bu">print</span>(<span class="st">&quot;Stable Matching:&quot;</span>, result)</span></code></pre></div>
+<h3 id="running-the-code">Running the Code</h3>
+<p>Executing the above code yields:</p>
+<pre><code>Stable Matching: [0, 1, 2]</code></pre>
+<p><strong>Interpretation</strong>: - <strong>Man 0</strong> is matched with <strong>Woman 0</strong>. - <strong>Man 1</strong> is matched with <strong>Woman 1</strong>. - <strong>Man 2</strong> is matched with <strong>Woman 2</strong>.</p>
+<p>This matching is stable because there are no two individuals who would prefer each other over their current partners.</p>
+<h3 id="visualizing-the-matching-process">Visualizing the Matching Process</h3>
+<p>To better grasp how the Gale-Shapley algorithm progresses, let’s visualize the proposals and engagements using matplotlib.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true"></a><span class="im">import</span> networkx <span class="im">as</span> nx</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true"></a></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true"></a><span class="kw">def</span> visualize_matching(men_prefs, women_prefs, matching):</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true"></a>    G <span class="op">=</span> nx.Graph()</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true"></a>    n <span class="op">=</span> <span class="bu">len</span>(matching)</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true"></a>    men <span class="op">=</span> [<span class="ss">f&quot;Man </span><span class="sc">{i}</span><span class="ss">&quot;</span> <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(n)]</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true"></a>    women <span class="op">=</span> [<span class="ss">f&quot;Woman </span><span class="sc">{i}</span><span class="ss">&quot;</span> <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(n)]</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true"></a>    </span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true"></a>    G.add_nodes_from(men, bipartite<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true"></a>    G.add_nodes_from(women, bipartite<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true"></a>    </span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true"></a>    edges <span class="op">=</span> []</span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true"></a>    <span class="cf">for</span> man, woman <span class="kw">in</span> <span class="bu">enumerate</span>(matching):</span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true"></a>        edges.append((<span class="ss">f&quot;Man </span><span class="sc">{</span>man<span class="sc">}</span><span class="ss">&quot;</span>, <span class="ss">f&quot;Woman </span><span class="sc">{</span>woman<span class="sc">}</span><span class="ss">&quot;</span>))</span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true"></a>    </span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true"></a>    G.add_edges_from(edges)</span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true"></a>    </span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true"></a>    pos <span class="op">=</span> {}</span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true"></a>    pos.update((node, (<span class="dv">1</span>, index)) <span class="cf">for</span> index, node <span class="kw">in</span> <span class="bu">enumerate</span>(men))</span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true"></a>    pos.update((node, (<span class="dv">2</span>, index)) <span class="cf">for</span> index, node <span class="kw">in</span> <span class="bu">enumerate</span>(women))</span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true"></a>    </span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true"></a>    plt.figure(figsize<span class="op">=</span>(<span class="dv">8</span>, <span class="dv">6</span>))</span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true"></a>    nx.draw(G, pos, with_labels<span class="op">=</span><span class="va">True</span>, node_color<span class="op">=</span>[<span class="st">&#39;lightblue&#39;</span> <span class="cf">if</span> node.startswith(<span class="st">&#39;Man&#39;</span>) <span class="cf">else</span> <span class="st">&#39;lightpink&#39;</span> <span class="cf">for</span> node <span class="kw">in</span> G.nodes()])</span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true"></a>    plt.title(<span class="st">&quot;Stable Matching Visualization&quot;</span>)</span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true"></a>    plt.show()</span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true"></a></span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true"></a>visualize_matching(men_preferences, women_preferences, result)</span></code></pre></div>
+<p><strong>Visualization Output</strong>:</p>
+<p>This graph illustrates the final stable matching, clearly showing which man is paired with which woman.</p>
+<h2 id="further-analysis-of-the-gale-shapley-algorithm">Further Analysis of the Gale-Shapley Algorithm</h2>
+<h3 id="stability-in-the-matchings">Stability in the Matchings</h3>
+<p>One of the most important characteristics of the Gale-Shapley algorithm is the stability of the matchings it produces. Stability means that no pair of individuals from opposite sets (men and women) would prefer each other over their current matches.</p>
+<p>We can analyze stability visually by considering <strong>preference rankings</strong> and how the algorithm satisfies each participant’s preferences. Consider an example where: - Men have preferences for women. - Women have preferences for men. - The goal is to find a matching where there are no “blocking pairs.”</p>
+<p>A <strong>blocking pair</strong> would occur if, for example, a man preferred a woman who was matched to another man, and that woman also preferred the first man over her current partner. The beauty of the Gale-Shapley algorithm is that such a situation is impossible when the algorithm concludes.</p>
+<h3 id="dynamics-of-preference-and-proposals">Dynamics of Preference and Proposals</h3>
+<p>Let’s visualize the <strong>proposal dynamics</strong>. Men make sequential proposals based on their preferences, and women tentatively accept or reject proposals based on their own preferences. This process guarantees that men continue proposing until they find a stable match.</p>
+<p>Below is a plot showing how many rounds of proposals occur before the matching stabilizes. Each round is represented by the number of men who are still free and proposing.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true"></a><span class="kw">def</span> plot_proposals_dynamics(m</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true"></a></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true"></a>en_preferences, women_preferences):</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true"></a>    free_men_count <span class="op">=</span> []</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true"></a>    n <span class="op">=</span> <span class="bu">len</span>(men_preferences)</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true"></a>    free_men <span class="op">=</span> <span class="bu">list</span>(<span class="bu">range</span>(n))</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true"></a>    men_next_proposal <span class="op">=</span> [<span class="dv">0</span>] <span class="op">*</span> n</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true"></a>    women_engaged_to <span class="op">=</span> [<span class="op">-</span><span class="dv">1</span>] <span class="op">*</span> n</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true"></a></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true"></a>    women_rankings <span class="op">=</span> []</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true"></a>    <span class="cf">for</span> prefs <span class="kw">in</span> women_preferences:</span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true"></a>        ranking <span class="op">=</span> {man: rank <span class="cf">for</span> rank, man <span class="kw">in</span> <span class="bu">enumerate</span>(prefs)}</span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true"></a>        women_rankings.append(ranking)</span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true"></a></span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true"></a>    rounds <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true"></a>    <span class="cf">while</span> free_men:</span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true"></a>        rounds <span class="op">+=</span> <span class="dv">1</span></span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true"></a>        free_men_count.append(<span class="bu">len</span>(free_men))</span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true"></a>        </span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true"></a>        man <span class="op">=</span> free_men.pop(<span class="dv">0</span>)</span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true"></a>        woman <span class="op">=</span> men_preferences[man][men_next_proposal[man]]</span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true"></a>        men_next_proposal[man] <span class="op">+=</span> <span class="dv">1</span></span>
+<span id="cb4-23"><a href="#cb4-23" aria-hidden="true"></a></span>
+<span id="cb4-24"><a href="#cb4-24" aria-hidden="true"></a>        <span class="cf">if</span> women_engaged_to[woman] <span class="op">==</span> <span class="op">-</span><span class="dv">1</span>:</span>
+<span id="cb4-25"><a href="#cb4-25" aria-hidden="true"></a>            women_engaged_to[woman] <span class="op">=</span> man</span>
+<span id="cb4-26"><a href="#cb4-26" aria-hidden="true"></a>        <span class="cf">else</span>:</span>
+<span id="cb4-27"><a href="#cb4-27" aria-hidden="true"></a>            current_man <span class="op">=</span> women_engaged_to[woman]</span>
+<span id="cb4-28"><a href="#cb4-28" aria-hidden="true"></a>            <span class="cf">if</span> women_rankings[woman][man] <span class="op">&lt;</span> women_rankings[woman][current_man]:</span>
+<span id="cb4-29"><a href="#cb4-29" aria-hidden="true"></a>                women_engaged_to[woman] <span class="op">=</span> man</span>
+<span id="cb4-30"><a href="#cb4-30" aria-hidden="true"></a>                free_men.append(current_man)</span>
+<span id="cb4-31"><a href="#cb4-31" aria-hidden="true"></a>            <span class="cf">else</span>:</span>
+<span id="cb4-32"><a href="#cb4-32" aria-hidden="true"></a>                free_men.append(man)</span>
+<span id="cb4-33"><a href="#cb4-33" aria-hidden="true"></a></span>
+<span id="cb4-34"><a href="#cb4-34" aria-hidden="true"></a>    plt.plot(<span class="bu">range</span>(<span class="dv">1</span>, rounds<span class="op">+</span><span class="dv">1</span>), free_men_count, marker<span class="op">=</span><span class="st">&#39;o&#39;</span>, linestyle<span class="op">=</span><span class="st">&#39;-&#39;</span>)</span>
+<span id="cb4-35"><a href="#cb4-35" aria-hidden="true"></a>    plt.title(<span class="st">&quot;Dynamics of Proposal Rounds&quot;</span>)</span>
+<span id="cb4-36"><a href="#cb4-36" aria-hidden="true"></a>    plt.xlabel(<span class="st">&quot;Rounds&quot;</span>)</span>
+<span id="cb4-37"><a href="#cb4-37" aria-hidden="true"></a>    plt.ylabel(<span class="st">&quot;Number of Free Men&quot;</span>)</span>
+<span id="cb4-38"><a href="#cb4-38" aria-hidden="true"></a>    plt.grid(<span class="va">True</span>)</span>
+<span id="cb4-39"><a href="#cb4-39" aria-hidden="true"></a>    plt.show()</span>
+<span id="cb4-40"><a href="#cb4-40" aria-hidden="true"></a></span>
+<span id="cb4-41"><a href="#cb4-41" aria-hidden="true"></a>plot_proposals_dynamics(men_preferences, women_preferences)</span></code></pre></div>
+<p>This plot shows the number of free men after each round of proposals. As the algorithm progresses, the number of free men decreases until all participants are matched, indicating the matching’s convergence.</p>
+<h3 id="optimality-who-benefits">Optimality: Who Benefits?</h3>
+<p>One of the central aspects of the Gale-Shapley algorithm is the optimality for the proposing group (in this case, the men). Men propose in decreasing order of preference, meaning each man is guaranteed the best match possible among all stable matchings. On the other hand, women are left with the least preferred partners they could have in any stable matching.</p>
+<p>To visualize this, we can plot how well each man fares based on his preferences after the matching.</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true"></a><span class="kw">def</span> plot_optimality(men_prefs, matching):</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true"></a>    preference_ranks <span class="op">=</span> []</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true"></a>    <span class="cf">for</span> man, woman <span class="kw">in</span> <span class="bu">enumerate</span>(matching):</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true"></a>        rank <span class="op">=</span> men_prefs[man].index(woman)</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true"></a>        preference_ranks.append(rank)</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true"></a></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true"></a>    plt.bar(<span class="bu">range</span>(<span class="bu">len</span>(preference_ranks)), preference_ranks, color<span class="op">=</span><span class="st">&#39;lightblue&#39;</span>)</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true"></a>    plt.title(<span class="st">&quot;Men&#39;s Preference Satisfaction&quot;</span>)</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true"></a>    plt.xlabel(<span class="st">&quot;Man&quot;</span>)</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true"></a>    plt.ylabel(<span class="st">&quot;Preference Rank of Matched Woman (Lower is Better)&quot;</span>)</span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true"></a>    plt.xticks(<span class="bu">range</span>(<span class="bu">len</span>(preference_ranks)), [<span class="ss">f&quot;Man </span><span class="sc">{i}</span><span class="ss">&quot;</span> <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="bu">len</span>(preference_ranks))])</span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true"></a>    plt.grid(<span class="va">True</span>)</span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true"></a>    plt.show()</span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true"></a></span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true"></a>plot_optimality(men_preferences, result)</span></code></pre></div>
+<p>This bar chart displays how well each man fared in the matching based on his preference ranking. A lower rank indicates a better match (closer to the man’s first choice). This visualization confirms that the Gale-Shapley algorithm optimizes for the proposing group, as most men will be paired with their highly preferred partners.</p>
+<h3 id="suboptimality-for-the-receiving-group">Suboptimality for the Receiving Group</h3>
+<p>While the algorithm is optimal for the proposing group (men), it leaves the receiving group (women) with suboptimal matches. Women are paired with their least preferred partners among all stable matchings.</p>
+<p>To visualize this, we can create a similar plot for the women, showing their satisfaction levels.</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true"></a><span class="kw">def</span> plot_women_optimality(women_prefs, matching):</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true"></a>    preference_ranks <span class="op">=</span> []</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true"></a>    <span class="cf">for</span> man, woman <span class="kw">in</span> <span class="bu">enumerate</span>(matching):</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true"></a>        rank <span class="op">=</span> women_prefs[woman].index(man)</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true"></a>        preference_ranks.append(rank)</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true"></a></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true"></a>    plt.bar(<span class="bu">range</span>(<span class="bu">len</span>(preference_ranks)), preference_ranks, color<span class="op">=</span><span class="st">&#39;lightpink&#39;</span>)</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true"></a>    plt.title(<span class="st">&quot;Women&#39;s Preference Satisfaction&quot;</span>)</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true"></a>    plt.xlabel(<span class="st">&quot;Woman&quot;</span>)</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true"></a>    plt.ylabel(<span class="st">&quot;Preference Rank of Matched Man (Lower is Better)&quot;</span>)</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true"></a>    plt.xticks(<span class="bu">range</span>(<span class="bu">len</span>(preference_ranks)), [<span class="ss">f&quot;Woman </span><span class="sc">{i}</span><span class="ss">&quot;</span> <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="bu">len</span>(preference_ranks))])</span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true"></a>    plt.grid(<span class="va">True</span>)</span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true"></a>    plt.show()</span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true"></a></span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true"></a>plot_women_optimality(women_preferences, result)</span></code></pre></div>
+<p>This plot reveals that women generally end up with less optimal partners compared to men, as the algorithm is biased in favor of the proposing group. The higher ranks for women indicate suboptimal matches.</p>
+<h2 id="concluding-analysis">Concluding Analysis</h2>
+<h3 id="algorithm-performance">Algorithm Performance</h3>
+<p>The Gale-Shapley algorithm consistently finds stable matchings in (O(n^2)) time, making it computationally efficient even for large datasets. The proposal dynamics show that the number of free men decreases steadily with each round of proposals, ensuring rapid convergence to a stable matching.</p>
+<h3 id="fairness-and-bias">Fairness and Bias</h3>
+<p>While the algorithm guarantees stability, it introduces a bias in favor of the proposing group. Men (the proposers) always receive their best possible matches, while women (the receivers) are left with less optimal matches. This asymmetry has implications in real-world scenarios, such as medical residency assignments or college admissions, where fairness and equity are important considerations.</p>
+<h3 id="future-work-modifying-the-algorithm">Future Work: Modifying the Algorithm</h3>
+<p>In some contexts, it may be desirable to reverse the roles of proposers and receivers or modify the algorithm to balance the outcomes. One approach could be to alternate proposals between men and women or introduce a weighted matching system that balances preferences more fairly across both groups.</p>
+<p><strong>Feel free to explore the provided Python code, visualizations, and results to deepen your understanding of the Gale-Shapley algorithm and its implications in stable matching problems!</strong></p>
+    </main>
+    <footer>
+        <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/katex/dist/katex.min.css">
+        <script src="//cdn.jsdelivr.net/combine/npm/katex/dist/katex.min.js,npm/katex/dist/contrib/auto-render.min.js,npm/@xiee/utils/js/render-katex.js" defer></script>
+        <script src="//cdn.jsdelivr.net/npm/@xiee/utils/js/center-img.min.js" defer></script>
+        <hr/>
+&copy; 2024 Darshan Makwana
+    </footer>
+</body>
+</html>

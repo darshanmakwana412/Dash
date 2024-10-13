@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>About | Darshan Makwana</title>
+    <link rel="stylesheet" href="css/style.css"/>
+    <link rel="stylesheet" href="css/fonts.css"/>
+</head>
+<body>
+    <nav style="display: flex; justify-content: space-between;">
+        <h1>Darshan Makwana</h1>
+        <ul class="menu">
+<li><a href="index.html">Home</a></li><li><a href="about.html">About</a></li><li><a href="post.html">Post</a></li>
+        </ul>
+    </nav>
+    <hr/>
+    <main>
+        <p><strong>XMin</strong> is the first Hugo theme I have designed. The original reason that I wrote it was I needed a minimal example of Hugo themes when I was writing the <a href="https://github.com/rstudio/blogdown"><strong>blogdown</strong></a> book. Basically I wanted a simple theme that supports a navigation menu, a home page, other single pages, lists of pages, blog posts, categories, tags, and RSS. That is all. Nothing fancy. In terms of CSS and JavaScript, I really want to keep them minimal. In fact, this theme does not contain any JavaScript code at all, although on this example website I did introduce some JavaScript code (still relatively simple anyway). The theme does not contain any images, either, and is pretty much a plain-text theme.</p>
+<p>The theme name “XMin” can be interpreted as “<strong>X</strong>ie’s <strong>Min</strong>imal theme” (Xie is my last name) or “e<strong>X</strong>tremely <strong>Min</strong>imal theme”.</p>
+<h2 id="hugo.yaml-the-config-file"><code>hugo.yaml</code> (the config file)</h2>
+<p>For this example site, I defined permalinks for two sections, <code>post</code> and <code>note</code>, so that the links to pages under these directories will contain the date info, e.g., <code>https://xmin.yihui.org/post/2016/02/14/a-plain-markdown-post/</code>. This is optional, and it is up to your personal taste of URLs.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a><span class="fu">permalinks</span><span class="kw">:</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true"></a><span class="at">  </span><span class="fu">note</span><span class="kw">:</span><span class="at"> </span><span class="st">&quot;/note/:year/:month/:day/:slug/&quot;</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true"></a><span class="at">  </span><span class="fu">post</span><span class="kw">:</span><span class="at"> </span><span class="st">&quot;/post/:year/:month/:day/:slug/&quot;</span></span></code></pre></div>
+<p>You can define the menu through <code>menu.main</code>, e.g.,</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true"></a><span class="fu">menu</span><span class="kw">:</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true"></a><span class="at">  </span><span class="fu">main</span><span class="kw">:</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true"></a><span class="at">    </span><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> Home</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true"></a><span class="at">      </span><span class="fu">url</span><span class="kw">:</span><span class="at"> </span><span class="st">&quot;&quot;</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true"></a><span class="at">      </span><span class="fu">weight</span><span class="kw">:</span><span class="at"> </span><span class="dv">1</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true"></a><span class="at">    </span><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> About</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true"></a><span class="at">      </span><span class="fu">url</span><span class="kw">:</span><span class="at"> </span><span class="st">&quot;about/&quot;</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true"></a><span class="at">      </span><span class="fu">weight</span><span class="kw">:</span><span class="at"> </span><span class="dv">2</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true"></a><span class="at">    </span><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> Categories</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true"></a><span class="at">      </span><span class="fu">url</span><span class="kw">:</span><span class="at"> </span><span class="st">&quot;categories/&quot;</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true"></a><span class="at">      </span><span class="fu">weight</span><span class="kw">:</span><span class="at"> </span><span class="dv">3</span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true"></a><span class="at">    </span><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> Tags</span></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true"></a><span class="at">      </span><span class="fu">url</span><span class="kw">:</span><span class="at"> </span><span class="st">&quot;tags/&quot;</span></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true"></a><span class="at">      </span><span class="fu">weight</span><span class="kw">:</span><span class="at"> </span><span class="dv">4</span></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true"></a><span class="at">    </span><span class="kw">-</span><span class="at"> </span><span class="fu">name</span><span class="kw">:</span><span class="at"> Subscribe</span></span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true"></a><span class="at">      </span><span class="fu">url</span><span class="kw">:</span><span class="at"> </span><span class="st">&quot;index.xml&quot;</span></span></code></pre></div>
+<p>Alternatively, you can add <code>menu: main</code> to the YAML metadata of any of your pages, so that these pages will appear in the menu.</p>
+<p>The page footer can be defined in <code>.Params.footer</code>, and the text is treated as Markdown, e.g.,</p>
+<pre><code>params:
+  footer: &quot;&amp;copy; [Yihui Xie](https://yihui.org) 2017 -- {Year}&quot;</code></pre>
+<p>Here <code>{Year}</code> means the year in which the site is built (usually the current year).</p>
+<h2 id="custom-layouts">Custom layouts</h2>
+<p>There are two layout files under <code>layouts/partials/</code> that you may want to override: <code>head_custom.html</code> and <code>foot_custom.html</code>. This is how you inject arbitrary HTML code to the head and foot areas. For example, this site has a file <code>layouts/partials/foot_custom.html</code> to support LaTeX math via KaTeX and center images automatically:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode html"><code class="sourceCode html"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true"></a><span class="kw">&lt;link</span><span class="ot"> rel=</span><span class="st">&quot;stylesheet&quot;</span><span class="ot"> href=</span><span class="st">&quot;//cdn.jsdelivr.net/npm/katex/dist/katex.min.css&quot;</span><span class="kw">&gt;</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true"></a><span class="kw">&lt;script</span><span class="ot"> src=</span><span class="st">&quot;//cdn.jsdelivr.net/combine/npm/katex/dist/katex.min.js,npm/katex/dist/contrib/auto-render.min.js,npm/@xiee/utils/js/render-katex.js&quot;</span><span class="ot"> defer</span><span class="kw">&gt;&lt;/script&gt;</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true"></a></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true"></a><span class="kw">&lt;script</span><span class="ot"> src=</span><span class="st">&quot;//cdn.jsdelivr.net/npm/@xiee/utils/js/center-img.min.js&quot;</span><span class="ot"> defer</span><span class="kw">&gt;&lt;/script&gt;</span></span></code></pre></div>
+<p>You can certainly enable highlight.js for syntax highlighting by yourself through <code>head_custom.html</code> and <code>foot_custom.html</code> if you want.</p>
+<p>If you do not like the default fonts (e.g., <code>Palatino</code>), you may provide your own <code>static/css/fonts.css</code> under the root directory of your website to override the <code>fonts.css</code> in the theme.</p>
+<h2 id="other-features">Other features</h2>
+<p>I could have added more features to this theme, but I decided not to, since I have no intention to make this theme feature-rich. However, I will teach you how. I have prepared several examples via pull requests at https://github.com/yihui/hugo-xmin/pulls, so that you can see the implementations of these features when you check out the diffs in the pull requests. For example, you can:</p>
+<ul>
+<li><p><a href="https://github.com/yihui/hugo-xmin/pull/3">Enable Google Analytics</a></p></li>
+<li><p><a href="https://github.com/yihui/hugo-xmin/pull/4">Enable Disqus comments</a></p></li>
+<li><p><a href="https://github.com/yihui/hugo-xmin/pull/5">Enable highlight.js for syntax highlighting of code blocks</a></p></li>
+<li><p><a href="https://github.com/yihui/hugo-xmin/pull/2">Display categories and tags on a page</a></p></li>
+<li><p><a href="https://github.com/yihui/hugo-xmin/pull/7">Add a table of contents</a></p></li>
+<li><p><a href="https://github.com/yihui/hugo-xmin/pull/6">Add a link in the footer of each page to “Edit this page” on Github</a></p></li>
+</ul>
+<p>To fully understand these examples, you have to read <a href="https://bookdown.org/yihui/blogdown/templates.html">the section on Hugo templates</a> in the <strong>blogdown</strong> book.</p>
+<h1 id="design-philosophy">Design philosophy</h1>
+<p>Lastly, a few words about my design philosophy for this theme: I have been relying on existing frameworks like Bootstrap for years since I’m not really a designer, and I was always scared by the complexity of CSS.</p>
+<p>When I started writing this theme, I asked myself, “<em>What if I just write from scratch?</em>” No Bootstrap. No Normalize.css. I don’t care about IE (life could be so much easier without IE) or inconsistencies among browsers (for personal websites). As long as the theme looks okay in Chrome, Firefox, and Safari, I’m done. Thanks to the simplicity of Markdown, you cannot really produce very complicated HTML, and I think styling the HTML output from Markdown is much simpler than general HTML documents. For example, I do not need to care much about form elements like textareas or buttons.</p>
+<p>After I finished this theme, I started to wonder why I’d need <code>normalize.css</code> at all. The default appearance of modern browsers actually looks pretty good in my eyes, after I tweak the typeface a little bit.</p>
+<p>Compared to inconsistencies across browsers, I care much more about these properties of HTML elements:</p>
+<ul>
+<li>Tables should always be centered, and striped tables are easier to read especially when they are wide. Tables should not have vertical borders.</li>
+<li>An image should be centered if it is the only child element of a paragraph.</li>
+<li>The <code>max-width</code> of images, videos, and iframes should be <code>100%</code>.</li>
+</ul>
+<p>I hope you can enjoy this theme. The source code is <a href="https://github.com/yihui/hugo-xmin">on Github</a>. Happy hacking!</p>
+    </main>
+    <footer>
+        <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/katex/dist/katex.min.css">
+        <script src="//cdn.jsdelivr.net/combine/npm/katex/dist/katex.min.js,npm/katex/dist/contrib/auto-render.min.js,npm/@xiee/utils/js/render-katex.js" defer></script>
+        <script src="//cdn.jsdelivr.net/npm/@xiee/utils/js/center-img.min.js" defer></script>
+        <hr/>
+&copy; 2024 Darshan Makwana
+    </footer>
+</body>
+</html>

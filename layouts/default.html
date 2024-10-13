@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{ .Title }} | {{ .Site.Title }}</title>
+    <link rel="stylesheet" href="css/style.css"/>
+    <link rel="stylesheet" href="css/fonts.css"/>
+</head>
+<body>
+    <nav style="display: flex; justify-content: space-between;">
+        <h1>Darshan Makwana</h1>
+        <ul class="menu">
+            {{ nav }}
+        </ul>
+    </nav>
+    <hr/>
+    <main>
+        {{ .Content }}
+    </main>
+    <footer>
+        <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/katex/dist/katex.min.css">
+        <script src="//cdn.jsdelivr.net/combine/npm/katex/dist/katex.min.js,npm/katex/dist/contrib/auto-render.min.js,npm/@xiee/utils/js/render-katex.js" defer></script>
+        <script src="//cdn.jsdelivr.net/npm/@xiee/utils/js/center-img.min.js" defer></script>
+        <hr/>
+        {{ footer }}
+    </footer>
+</body>
+</html>
