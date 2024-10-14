@@ -19,12 +19,25 @@ MENU_TITLES=()
 MENU_FILES=()
 MENU_RANK=()
 
-for markdown_file in "$INPUT_DIR"/*.md; do
+POSTS_TITLES=()
+POSTS_FILES=()
+POSTS_DATES=()
+POSTS_RANK=()
 
-    filename=$(basename "$markdown_file" .md)
-    output_file="$filename.html"
+# Collect all markdown files recursively
+mapfile -t markdown_files < <(find "$INPUT_DIR" -type f -name '*.md')
+
+# First pass: Collect metadata for menus and posts
+for markdown_file in "${markdown_files[@]}"; do
+    relative_path="${markdown_file#$INPUT_DIR/}"
+    dirname=$(dirname "$relative_path")
+    filename=$(basename "$relative_path" .md)
+    output_file="$dirname/$filename.html"
 
     title=""
+    date=""
+    rank=""
+
     front_matter=0
 
     while IFS= read -r line || [[ -n "$line" ]]; do
@@ -37,6 +50,8 @@ for markdown_file in "$INPUT_DIR"/*.md; do
                 title="${BASH_REMATCH[1]}"
             elif [[ "$line" =~ ^rank:\ (.*) ]]; then
                 rank="${BASH_REMATCH[1]}"
+            elif [[ "$line" =~ ^date:\ (.*) ]]; then
+                date="${BASH_REMATCH[1]}"
             fi
         else
             break
@@ -45,15 +60,22 @@ for markdown_file in "$INPUT_DIR"/*.md; do
 
     [[ -z "$title" ]] && title="$filename"
 
-    MENU_TITLES+=("$title")
-    MENU_FILES+=("$output_file")
-    MENU_RANK+=("$rank")
+    if [[ "$dirname" == "posts" ]]; then
+        # Collect posts data
+        POSTS_TITLES+=("$title")
+        POSTS_FILES+=("$output_file")
+        POSTS_DATES+=("$date")
+        POSTS_RANK+=("$rank")
+    else
+        # Collect menu data
+        MENU_TITLES+=("$title")
+        MENU_FILES+=("$output_file")
+        MENU_RANK+=("$rank")
+    fi
 done
 
 generate_menu_html() {
     local menu_html=""
-    local i
-
     local indices=($(seq 0 $((${#MENU_FILES[@]} - 1))))
 
     IFS=$'\n' sorted_indices=($(for idx in "${indices[@]}"; do
@@ -69,10 +91,28 @@ generate_menu_html() {
     echo "$menu_html"
 }
 
+generate_posts_list() {
+    local posts_list=""
+    local indices=($(seq 0 $((${#POSTS_FILES[@]} - 1))))
+
+    IFS=$'\n' sorted_indices=($(for idx in "${indices[@]}"; do
+        echo "$idx ${POSTS_RANK[$idx]}"
+    done | sort -k2 -n | awk '{print $1}'))
+
+    for idx in "${sorted_indices[@]}"; do
+        local output_file="${POSTS_FILES[$idx]}"
+        local title="${POSTS_TITLES[$idx]}"
+        local date="${POSTS_DATES[$idx]}"
+        posts_list+="<li><a href=\"$output_file\">$title</a> - $date</li>"
+    done
+
+    echo "$posts_list"
+}
+
 MENU_HTML=$(generate_menu_html)
+POSTS_LIST=$(generate_posts_list)
 
 process_includes() {
-
     local template="$1"
     local depth="${2:-0}"
 
@@ -110,24 +150,31 @@ process_template() {
 
     template=$(process_includes "$template")
 
+    footer_html="&copy; $YEAR $SITE_TITLE"
+
+    # Replace placeholders using Bash parameter expansion
     template="${template//\{\{ site_title \}\}/$SITE_TITLE}"
     template="${template//\{\{ title \}\}/$title}"
     template="${template//\{\{ .Date \}\}/$date}"
     template="${template//\{\{ content \}\}/$content}"
     template="${template//\{\{ replace . \"\{Year\}\" now.Year \| markdownify\}\}/$YEAR}"
+    template="${template//\{\{ nav \}\}/$MENU_HTML}"
+    template="${template//\{\{ posts \}\}/$POSTS_LIST}"
+    template="${template//\{\{ footer \}\}/$footer_html}"
 
-    template=$(echo "$template" | sed -E "/\{\{ nav \}\}/c $MENU_HTML")
-
-    footer_html="&copy; $YEAR $SITE_TITLE"
-    template=$(echo "$template" | sed -E "/\{\{ footer \}\}/c $footer_html")
-
-    echo "$template" | sed -E 's/\{\{.*\}\}//g'
+    # Remove any unreplaced placeholders
+    echo "${template//\{\{*\}\}/}"
 }
 
-for markdown_file in "$INPUT_DIR"/*.md; do
+# Second pass: Generate HTML files
+for markdown_file in "${markdown_files[@]}"; do
+    relative_path="${markdown_file#$INPUT_DIR/}"
+    dirname=$(dirname "$relative_path")
+    filename=$(basename "$relative_path" .md)
+    output_dir="$OUTPUT_DIR/$dirname"
+    output_file="$output_dir/$filename.html"
 
-    filename=$(basename "$markdown_file" .md)
-    output_file="$OUTPUT_DIR/$filename.html"
+    mkdir -p "$output_dir"
 
     title=""
     layout="default"
@@ -161,7 +208,6 @@ for markdown_file in "$INPUT_DIR"/*.md; do
 
     [[ -z "$title" ]] && title="$filename"
 
-    echo $content
     html_content=$(echo "$content" | pandoc -f markdown -t html)
 
     template_file="$LAYOUTS_DIR/$layout.html"
@@ -177,3 +223,15 @@ for markdown_file in "$INPUT_DIR"/*.md; do
 
     echo "Generated $output_file"
 done
+
+# Generate posts.html page
+posts_template_file="$LAYOUTS_DIR/posts.html"
+
+if [[ ! -f "$posts_template_file" ]]; then
+    echo "Posts template $posts_template_file not found. Cannot generate posts.html"
+else
+    template=$(cat "$posts_template_file")
+    page_html=$(process_template "$template" "Posts" "" "" "")
+    echo "$page_html" > "$OUTPUT_DIR/posts.html"
+    echo "Generated $OUTPUT_DIR/posts.html"
+fi
