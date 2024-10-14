@@ -76,7 +76,7 @@ process_includes() {
     local template="$1"
     local depth="${2:-0}"
 
-    if [[ $depth -gt 10 ]]; then
+    if [[ $depth -gt 5 ]]; then
         echo "Maximum template inclusion depth exceeded."
         echo "$template"
         return
