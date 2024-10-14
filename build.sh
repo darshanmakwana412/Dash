@@ -71,6 +71,36 @@ generate_menu_html() {
 
 MENU_HTML=$(generate_menu_html)
 
+process_includes() {
+
+    local template="$1"
+    local depth="${2:-0}"
+
+    if [[ $depth -gt 10 ]]; then
+        echo "Maximum template inclusion depth exceeded."
+        echo "$template"
+        return
+    fi
+
+    while [[ "$template" =~ \{\{\ TEM:\ ([^[:space:]}]+)\ \}\} ]]; do
+        local include_name="${BASH_REMATCH[1]}"
+        local include_file="$LAYOUTS_DIR/$include_name.html"
+        if [[ -f "$include_file" ]]; then
+            local include_content=$(cat "$include_file")
+            # Recursively process includes in the included content
+            include_content=$(process_includes "$include_content" $((depth + 1)))
+            # Replace the placeholder with the include content
+            template="${template//\{\{ TEM: $include_name \}\}/$include_content}"
+        else
+            echo "Include file $include_file not found. Skipping inclusion."
+            # Remove the placeholder
+            template="${template//\{\{ TEM: $include_name \}\}/}"
+        fi
+    done
+
+    echo "$template"
+}
+
 process_template() {
     local template="$1"
     local title="$2"
@@ -78,10 +108,12 @@ process_template() {
     local date="$4"
     local author="$5"
 
-    template="${template//\{\{ .Site.Title \}\}/$SITE_TITLE}"
-    template="${template//\{\{ .Title \}\}/$title}"
+    template=$(process_includes "$template")
+
+    template="${template//\{\{ site_title \}\}/$SITE_TITLE}"
+    template="${template//\{\{ title \}\}/$title}"
     template="${template//\{\{ .Date \}\}/$date}"
-    template="${template//\{\{ .Content \}\}/$content}"
+    template="${template//\{\{ content \}\}/$content}"
     template="${template//\{\{ replace . \"\{Year\}\" now.Year \| markdownify\}\}/$YEAR}"
 
     template=$(echo "$template" | sed -E "/\{\{ nav \}\}/c $MENU_HTML")
